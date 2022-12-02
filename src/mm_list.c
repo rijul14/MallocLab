@@ -77,6 +77,21 @@ static void mm_list_next_set(BlockHeader *bp, BlockHeader *next) {
  */
 void mm_list_prepend(BlockHeader *bp) {
     // TODO: implement
+    if (mm_list_headp == NULL) {
+        FreeBlockHeader *fp = (FreeBlockHeader *)bp;
+        fp->next_free = NULL;
+        fp->prev_free = NULL;
+        mm_list_headp = bp;
+        mm_list_tailp = bp;
+    }
+    else {
+        FreeBlockHeader *fp = (FreeBlockHeader *)bp;
+        FreeBlockHeader *h = (FreeBlockHeader *)mm_list_headp;
+        fp->next_free = mm_list_headp;
+        fp->prev_free = NULL;
+        h->prev_free = bp;
+        mm_list_headp = bp;
+    }
 }
 
 /**
@@ -86,6 +101,21 @@ void mm_list_prepend(BlockHeader *bp) {
  */
 void mm_list_append(BlockHeader *bp) {
     // TODO: implement
+    if (mm_list_headp == NULL) {
+        FreeBlockHeader *fp = (FreeBlockHeader *)bp;
+        fp->next_free = NULL;
+        fp->prev_free = NULL;
+        mm_list_headp = bp;
+        mm_list_tailp = bp;
+    }
+    else {
+        FreeBlockHeader *t = (FreeBlockHeader *)mm_list_tailp;
+        FreeBlockHeader *fp = (FreeBlockHeader *)bp;
+        t->next_free = bp;
+        fp->prev_free = mm_list_tailp;
+        fp->next_free = NULL;
+        mm_list_tailp = bp;
+    }
 }
 
 /**
@@ -95,4 +125,20 @@ void mm_list_append(BlockHeader *bp) {
  */
 void mm_list_remove(BlockHeader *bp) {
     // TODO: implement
+    if (mm_list_headp == NULL) {
+        return;
+    }
+    FreeBlockHeader *fp = (FreeBlockHeader *)bp;
+    if (mm_list_headp == bp) {
+        mm_list_headp = fp->next_free;
+    }
+    if (mm_list_tailp == bp) {
+        mm_list_tailp = fp->prev_free;
+    }
+    if (fp->next_free != NULL) {
+        mm_list_prev_set(fp->next_free,fp->prev_free);
+    }
+    if (fp->prev_free != NULL) {
+        mm_list_next_set(fp->prev_free,fp->next_free);
+    }
 }
